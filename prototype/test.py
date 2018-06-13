@@ -1,12 +1,13 @@
 from prototype.Model import *
 import cv2
 
-model = Model("tiles/paths", (32, 32), 3)
+tile_dir = "tiles/spirals"
+
+model = Model(tile_dir, (64, 64), 3, rotate_patterns=True, iteration_limit=-1)
 model.generate_image()
 
 if False:
     break_all = False
-    print(model.patterns[6][0,0])
     print()
 
     for p_i_1 in range(model.num_patterns):
@@ -14,7 +15,7 @@ if False:
         for p_i_2 in range(model.num_patterns):
             scaled2 = cv2.resize(model.patterns[p_i_2], (128, 128), interpolation=cv2.INTER_AREA)
             comb = np.hstack((scaled1, np.full((128, 10, 3), 128), scaled2))
-            print("template: {}, conv: {}, result:\n{}\n".format(p_i_1, p_i_2, model.fit_table[p_i_1,p_i_2]))
+            print("template: {}, conv: {}, result:\n{}\n{}\n".format(p_i_1, p_i_2, model.fit_table[p_i_1,p_i_2], model.overlays))
             cv2.imshow("comparison", comb/255.0)
             k = cv2.waitKey(0)
             if k == 27:
@@ -29,7 +30,7 @@ result = cv2.resize(model.out_img, (800, 800), interpolation=cv2.INTER_AREA)
 # result = model.out_img
 cv2.imshow("result", result/255.0)
 cv2.waitKey(0)
-cv2.imwrite("result.png", result)
+cv2.imwrite("{}/results/result.png".format(tile_dir), result)
 
 # sub = np.array([[-1, -1, -1],
 #                 [-1, -1,  1],
