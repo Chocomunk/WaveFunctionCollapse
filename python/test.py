@@ -1,9 +1,9 @@
-from prototype.Model import *
+from python.Model import *
 import cv2
 
-tile_dir = "tiles/spirals"
+tile_dir = "../tiles/spirals"
 
-model = Model(tile_dir, (64, 64), 3, rotate_patterns=True, iteration_limit=-1)
+model = Model(tile_dir, (128, 128), 3, rotate_patterns=True, iteration_limit=-1)
 model.generate_image()
 
 if False:
@@ -27,25 +27,6 @@ if False:
             break
 
 result = cv2.resize(model.out_img, (800, 800), interpolation=cv2.INTER_AREA)
-# result = model.out_img
 cv2.imshow("result", result/255.0)
 cv2.waitKey(0)
 cv2.imwrite("{}/results/result.png".format(tile_dir), result)
-
-# sub = np.array([[-1, -1, -1],
-#                 [-1, -1,  1],
-#                 [-1,  1,  1]])
-#
-# obsv = np.array([[False, False, False],
-#                  [False, False,  True],
-#                  [False,  True,  True]])
-#
-# pattern = np.array([[ 0,  0,  1],
-#                     [ 0,  1,  1],
-#                     [ 1,  1,  1]])
-#
-# matches = np.equal(sub, pattern)
-# obsv_m = np.array_equal(matches, obsv)
-#
-# print(matches)
-# print(obsv_m)

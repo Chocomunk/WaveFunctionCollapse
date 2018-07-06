@@ -45,6 +45,7 @@ class Model:
 
         self.waves = np.full(self.wave_shape + (self.num_patterns,), True)
         self.observed = np.full(self.wave_shape, False)
+        self.registered_propogate = np.full(self.wave_shape, False)
         # self.entropies = np.full(self.wave_shape, -np.sum(self.probs * np.log2(self.probs)))
         self.entropies = np.ones(self.wave_shape, dtype=np.int16)*self.num_patterns
         self.out_img = np.full(self.img_shape + (3,), -1.)
@@ -109,6 +110,7 @@ class Model:
         iterations = 0
         while len(self.propagate_stack) > 0:
             row, col = self.propagate_stack.pop()
+            self.registered_propogate[row, col] = False
             valid_indices = []
             for i in range(self.num_patterns):
                 if self.waves[row, col, i]:
@@ -152,8 +154,9 @@ class Model:
                         valid_pattern_idx = i
             if valid_pattern_count == 1:
                 self.do_observe(row_s, col_s, valid_pattern_idx)
-            if changed and (row_s, col_s) not in self.propagate_stack:
+            if changed and not self.registered_propogate[row_s, col_s]:
                 self.propagate_stack.append((row_s, col_s))
+                self.registered_propogate[row_s, col_s] = True
 
     def create_waveforms(self, dim):
         height, width, depth = self.tiles[0].shape
