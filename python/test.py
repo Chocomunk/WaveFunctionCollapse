@@ -1,9 +1,9 @@
 from python.Model import *
 import cv2
 
-tile_dir = "../tiles/spirals"
+tile_dir = "../tiles/red"
 
-model = Model(tile_dir, (128, 128), 3, rotate_patterns=True, iteration_limit=-1)
+model = Model(tile_dir, (64, 64), 2, rotate_patterns=True, iteration_limit=-1)
 model.generate_image()
 
 if False:
@@ -29,4 +29,4 @@ if False:
 result = cv2.resize(model.out_img, (800, 800), interpolation=cv2.INTER_AREA)
 cv2.imshow("result", result/255.0)
 cv2.waitKey(0)
-cv2.imwrite("{}/results/result.png".format(tile_dir), result)
+cv2.imwrite("{}/results/python/result.png".format(tile_dir), result)

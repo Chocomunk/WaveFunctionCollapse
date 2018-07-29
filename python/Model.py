@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from prototype import Input
+from python import Input
 
 
 def entropy_b2(prob):
@@ -128,11 +128,11 @@ class Model:
                 print("propagation iteration: {}, propogation stack size: {}".format(iterations, len(self.propagate_stack)))
 
     def update_wave(self, row, col, overlay_idx, valid_indices):
-        row_shift, col_shift = self.overlays[overlay_idx]
+        col_shift, row_shift = self.overlays[overlay_idx]
         row_s = row+row_shift
         col_s = col+col_shift
-        if row_s >= 0 and row_s+self.dim-1 < self.wave_shape[0] and \
-                col_s >= 0 and col_s+self.dim-1 < self.wave_shape[1] and \
+        if row_s >= 0 and row_s < self.wave_shape[0] and \
+                col_s >= 0 and col_s < self.wave_shape[1] and \
                 not self.observed[row_s, col_s]:
             changed = False
             valid_pattern_count = 0
@@ -142,7 +142,7 @@ class Model:
                     can_fit = False
                     j = 0
                     while j < len(valid_indices) and not can_fit:
-                        can_fit = can_fit or self.fit_table[valid_indices[j], i, overlay_idx]
+                        can_fit = self.fit_table[valid_indices[j], i, overlay_idx]
                         j += 1
                     if not can_fit:
                         self.waves[row_s, col_s, i] = False
@@ -190,7 +190,7 @@ class Model:
                 patt2 = self.patterns[patt_idx2]
 
                 for i in range(len(self.overlays)):
-                    row_shift, col_shift = self.overlays[i]
+                    col_shift, row_shift = self.overlays[i]
 
                     row_start_1 = max(row_shift, 0)
                     row_end_1 = min(row_shift+self.dim-1, self.dim-1)
