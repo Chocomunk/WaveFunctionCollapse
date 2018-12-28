@@ -17,6 +17,19 @@ Wave shape y: WY
 
 class Model {
 
+private:
+	int stack_index_ = 0;
+	bool periodic_;
+
+	std::vector<WaveForm> propagate_stack_;	// Shape: [WX * WY * N]
+
+	std::vector<int> counts_;				// Shape: [N]
+	std::vector<int> entropy_;			// Shape: [WX, WY]
+	std::vector<std::vector<int>> fit_table_;	// Shape: [N, O][*]
+	std::vector<char> waves_;				// Shape: [WX, WY, N]
+	std::vector<int> observed_;			// Shape: [WX, WY]
+	std::vector<int> compatible_neighbors_; // Shape: [WX, WY, N, O]
+
 public:
 	const char dim;
 	const int iteration_limit;
@@ -30,30 +43,22 @@ public:
 	std::vector<cv::Mat> patterns;			// Shape: [N]
 	std::vector<Pair> overlays;				// Shape: [O]
 
-	std::stack<Pair> propagate_stack;
-
-	std::vector<int> counts;				// Shape: [N]
-	std::vector<int> entropies;				// Shape: [WX, WY]
-	std::vector<char> fit_table;			// Shape: [N, N, O]
-	std::vector<char> waves;				// Shape: [WX, WY, N]
-	std::vector<char> observed;				// Shape: [WX, WY]
-	std::vector<char> registered_propagate;	// Shape: [WX, WY]
-
 	cv::Mat out_img;
 
 public:
-	Model(std::string tile_dir, Pair &output_shape, char dim, std::vector<Pair> &overlays, bool rotate_patterns=false, int iteration_limit=-1);
+	Model(std::string tile_dir, Pair &output_shape, char dim, std::vector<Pair> &overlays, bool rotate_patterns=false, bool periodic=false, int iteration_limit=-1);
 	void generate_image();
+	void clear();
 	cv::Mat& get_image();
 
-public:
+private:
 	void get_lowest_entropy(Pair &idx);
 	void render_superpositions(int row, int col);
-	void observe_wave(Pair &wavef);
+	void observe_wave(Pair &wave);
 	void propagate();
-	void register_waveform(Pair &waveform);
-	Pair pop_waveform();
-	void update_wave(Pair &wavef, int overlay_idx, std::vector<int> &valid_indices);
+	void stack_waveform(WaveForm& waveform);
+	WaveForm pop_waveform();
+	void ban_waveform(Pair& wave, int pattern_i);
 
 	void create_waveforms(bool rotate_patterns);
 	void add_waveform(const cv::Mat &waveform);

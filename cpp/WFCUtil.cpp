@@ -7,9 +7,11 @@ std::ostream& operator<<(std::ostream& os, const Pair& obj) {
 	return os;
 }
 
-BGR::BGR(uchar b, uchar g, uchar r) : b(b), g(g), r(r) {}
+WaveForm::WaveForm(const Pair wave, const int pattern): wave(wave), pattern(pattern){}
 
-BGR BGR::operator/(int val) const
+BGR::BGR(const uchar b, const uchar g, const uchar r) : b(b), g(g), r(r) {}
+
+BGR BGR::operator/(const int val) const
 {
 	return BGR(b / val, g / val, r / val);
 }
@@ -38,9 +40,9 @@ void generate_sliding_overlay(const char dim, std::vector<Pair> &out) {
 void generate_neighbor_overlay(std::vector<Pair> &out) {
 	out.clear();
 	out.emplace_back(-1,  0);
+	out.emplace_back(0,  1);
 	out.emplace_back(1,  0);
 	out.emplace_back(0, -1);
-	out.emplace_back(0,  1);
 }
 
 bool patterns_equal(const cv::Mat &patt1, const cv::Mat &patt2) {

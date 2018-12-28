@@ -10,9 +10,18 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const Pair& obj);
 	inline Pair operator+(const Pair& other) const;
 	inline Pair operator+(const int val) const;
+	inline Pair operator%(const Pair& other) const;
 	inline bool operator<(const Pair& other) const;
 	inline bool non_negative() const;
 	inline bool shifted_less_than(const Pair& other, const int shift) const;
+};
+
+struct WaveForm
+{
+	Pair wave; int pattern;
+
+public:
+	WaveForm(Pair wave = Pair(0,0), int pattern = 0);
 };
 
 struct BGR final
@@ -46,6 +55,16 @@ inline Pair Pair::operator+(const Pair& other) const
 inline Pair Pair::operator+(const int val) const
 {
 	return Pair(this->x + val, this->y + val);
+}
+
+inline Pair Pair::operator%(const Pair& other) const
+{
+	auto x=this->x, y=this->y;
+	if (x >= other.x) x -= other.x;
+	if (x < 0) x += other.x;
+	if (y >= other.y) y -= other.y;
+	if (y < 0) y += other.y;
+	return Pair(x, y);
 }
 
 inline bool Pair::operator<(const Pair& other) const
