@@ -109,7 +109,7 @@ public:
 	/**
 	 * \brief Initializes a model instance and allocates all workspace data.
 	 */
-	Model(pair &output_shape, std::string tile_dir, char dim, std::vector<pair> &overlays, 
+	Model(pair &output_shape, std::vector<cv::Mat> &templates, char dim, std::vector<pair> &overlays, 
 		  bool rotate_patterns=false, bool periodic=false, int iteration_limit=-1);
 	
 	/**

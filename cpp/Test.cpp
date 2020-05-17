@@ -8,7 +8,10 @@
 int main() {
 	std::vector<pair> overlays;
 	generate_neighbor_overlay(overlays);
-	Model model(pair(64, 64), TILES_DIR, 3, overlays, true, true, -1);
+	std::vector<cv::Mat> template_imgs;
+	load_tiles(TILES_DIR, template_imgs);
+	Model model(pair(64, 64), template_imgs, 3, overlays, 
+		true, true, -1);
 	
 #ifdef SHOWPATTS
 	bool break_all = false;

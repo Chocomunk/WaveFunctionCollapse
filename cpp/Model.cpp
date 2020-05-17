@@ -2,13 +2,12 @@
 #include "Input.h"
 #include "WFCUtil.h"
 
-Model::Model(pair &output_shape, const std::string tile_dir, const char dim, std::vector<pair> &overlays, 
-	const bool rotate_patterns, const bool periodic, const int iteration_limit) : 
-dim(dim), periodic_(periodic), iteration_limit(iteration_limit), overlay_count(overlays.size()),
+Model::Model(pair &output_shape, std::vector<cv::Mat> &templates, const char dim, 
+	std::vector<pair> &overlays, const bool rotate_patterns, const bool periodic, 
+	const int iteration_limit) : 
+templates(templates), dim(dim), periodic_(periodic), iteration_limit(iteration_limit), overlay_count(overlays.size()),
 img_shape(output_shape), overlays(overlays) {
-	load_tiles(tile_dir, templates);
 	create_waveforms(rotate_patterns);
-
 	srand(time(nullptr));
 
 	// Initialize size fields
