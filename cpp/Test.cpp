@@ -14,15 +14,15 @@ int main() {
 	bool break_all = false;
 	std::cout << std::endl;
 
-	for (int pat_idx1 = 0; pat_idx1 < model.num_patterns; pat_idx1++) {
+	for (size_t pat_idx1 = 0; pat_idx1 < model.num_patterns; pat_idx1++) {
 		cv::Mat scaled1;
 		auto patt1 = model.patterns[pat_idx1];
 		cv::resize(patt1, scaled1, cv::Size(128, 128), 0.0, 0.0, cv::INTER_AREA);
 		std::cout << "Pattern: " << pat_idx1 << " | Pattern count: " << model.counts_[pat_idx1] << std::endl;
 		
-		for (int overlay_idx = 0; overlay_idx < model.overlay_count; overlay_idx++) {
-			int index = pat_idx1 * model.overlay_count + overlay_idx;
-			int opposite_idx = pat_idx1 * model.overlay_count + ((overlay_idx + 2) % model.overlay_count);
+		for (size_t overlay_idx = 0; overlay_idx < model.overlay_count; overlay_idx++) {
+			size_t index = pat_idx1 * model.overlay_count + overlay_idx;
+			size_t opposite_idx = pat_idx1 * model.overlay_count + ((overlay_idx + 2) % model.overlay_count);
 			auto valid_patterns = model.fit_table_[index];
 			Pair overlay = overlays[overlay_idx];
 			Pair opposite = overlays[(overlay_idx + 2) % model.overlay_count];
@@ -34,7 +34,7 @@ int main() {
 
 			bool break_part = false;
 
-			for (int pat_idx2 = 0; pat_idx2 < model.num_patterns; pat_idx2++) {
+			for (size_t pat_idx2 = 0; pat_idx2 < model.num_patterns; pat_idx2++) {
 				auto patt2 = model.patterns[pat_idx2];
 				cv::Mat scaled2;
 				cv::resize(patt2, scaled2, cv::Size(128, 128), 0.0, 0.0, cv::INTER_AREA);

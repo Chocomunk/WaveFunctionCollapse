@@ -3,17 +3,17 @@
 #include <opencv2\opencv.hpp>
 
 struct Pair {
-	int x; int y; int size;
+	size_t x; size_t y; size_t size;
 
 public:
-	explicit Pair(int x=0, int y=0);
+	explicit Pair(size_t x=0, size_t y=0);
 	friend std::ostream& operator<<(std::ostream& os, const Pair& obj);
 	inline Pair operator+(const Pair& other) const;
-	inline Pair operator+(const int val) const;
+	inline Pair operator+(const size_t val) const;
 	inline Pair operator%(const Pair& other) const;
 	inline bool operator<(const Pair& other) const;
 	inline bool non_negative() const;
-	inline bool shifted_less_than(const Pair& other, const int shift) const;
+	inline bool shifted_less_than(const Pair& other, const size_t shift) const;
 };
 
 struct WaveForm
@@ -52,7 +52,7 @@ inline Pair Pair::operator+(const Pair& other) const
 	return Pair(this->x + other.x, this->y + other.y);
 }
 
-inline Pair Pair::operator+(const int val) const
+inline Pair Pair::operator+(const size_t val) const
 {
 	return Pair(this->x + val, this->y + val);
 }
@@ -77,7 +77,7 @@ inline bool Pair::non_negative() const
 	return this->x >= 0 && this->y >= 0;
 }
 
-inline bool Pair::shifted_less_than(const Pair& other, const int shift) const
+inline bool Pair::shifted_less_than(const Pair& other, const size_t shift) const
 {
 	return this->x + shift < other.x && this->y + shift < other.y;
 }
