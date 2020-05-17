@@ -11,30 +11,30 @@ int main() {
 	Model model(TILES_DIR, Pair(64, 64), 3, overlays, true, true, -1);
 	
 #ifdef SHOWPATTS
-	auto break_all = false;
+	bool break_all = false;
 	std::cout << std::endl;
 
-	for (auto pat_idx1 = 0; pat_idx1 < model.num_patterns; pat_idx1++) {
+	for (int pat_idx1 = 0; pat_idx1 < model.num_patterns; pat_idx1++) {
 		cv::Mat scaled1;
 		auto patt1 = model.patterns[pat_idx1];
 		cv::resize(patt1, scaled1, cv::Size(128, 128), 0.0, 0.0, cv::INTER_AREA);
 		std::cout << "Pattern: " << pat_idx1 << " | Pattern count: " << model.counts_[pat_idx1] << std::endl;
 		
-		for (auto overlay_idx = 0; overlay_idx < model.overlay_count; overlay_idx++) {
+		for (int overlay_idx = 0; overlay_idx < model.overlay_count; overlay_idx++) {
 			int index = pat_idx1 * model.overlay_count + overlay_idx;
 			int opposite_idx = pat_idx1 * model.overlay_count + ((overlay_idx + 2) % model.overlay_count);
 			auto valid_patterns = model.fit_table_[index];
-			auto overlay = overlays[overlay_idx];
-			auto opposite = overlays[(overlay_idx + 2) % model.overlay_count];
+			Pair overlay = overlays[overlay_idx];
+			Pair opposite = overlays[(overlay_idx + 2) % model.overlay_count];
 			std::cout << "Valid Patterns: ";
-			for (auto pattern_2: valid_patterns)	std::cout << pattern_2 << ", ";
+			for (int pattern_2: valid_patterns)	std::cout << pattern_2 << ", ";
 			std::cout << std::endl;
 			std::cout << "Compat Table Length: " << model.compatible_neighbors_[opposite_idx] << std::endl;
 			std::cout << "Overlay: " << overlay << " | Opposite: " << opposite << std::endl;
 
-			auto break_part = false;
+			bool break_part = false;
 
-			for (auto pat_idx2 = 0; pat_idx2 < model.num_patterns; pat_idx2++) {
+			for (int pat_idx2 = 0; pat_idx2 < model.num_patterns; pat_idx2++) {
 				auto patt2 = model.patterns[pat_idx2];
 				cv::Mat scaled2;
 				cv::resize(patt2, scaled2, cv::Size(128, 128), 0.0, 0.0, cv::INTER_AREA);
@@ -48,7 +48,7 @@ int main() {
 				std::cout << "    " << patterns_equal(patt1, patt2) << ": " << "Patterns are equal" << std::endl;
 
 				cv::imshow("comparison", comb);
-				auto k = cv::waitKey(0);
+				int k = cv::waitKey(0);
 				if (k == 27) {
 					break_all = true;
 					break_part = true;

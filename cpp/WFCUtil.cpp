@@ -28,8 +28,8 @@ void BGR::operator+=(BGR& other) {
 }
 
 void generate_sliding_overlay(const char dim, std::vector<Pair> &out) {
-	for (auto i = 1 - dim; i < dim; i++) {
-		for (auto j = 1 - dim; j < dim; j++) {
+	for (int i = 1 - dim; i < dim; i++) {
+		for (int j = 1 - dim; j < dim; j++) {
 			if (i != 0 || j != 0) {
 				out.emplace_back(i, j);
 			}
@@ -50,9 +50,9 @@ bool patterns_equal(const cv::Mat &patt1, const cv::Mat &patt2) {
 		patt1.depth() == CV_8U &&
 		patt1.channels() == patt2.channels() &&
 		patt1.cols == patt2.cols && patt1.rows == patt2.rows);
-	const auto channels = patt1.channels();
-	auto n_rows = patt1.rows;
-	auto n_cols = patt1.cols * channels;
+	const int channels = patt1.channels();
+	int n_rows = patt1.rows;
+	int n_cols = patt1.cols * channels;
 
 	if (patt1.isContinuous() && patt2.isContinuous()) {
 		n_cols *= n_rows;
@@ -61,7 +61,7 @@ bool patterns_equal(const cv::Mat &patt1, const cv::Mat &patt2) {
 
 	int i, j;
 	const uchar* p1; const uchar* p2;
-	auto matching = true;
+	bool matching = true;
 	for (i = 0; i < n_rows && matching; i++) {
 		p1 = patt1.ptr<uchar>(i);
 		p2 = patt2.ptr<uchar>(i);
@@ -82,13 +82,13 @@ bool overlay_fit(const cv::Mat &patt1, const cv::Mat &patt2, Pair &overlay, char
 		patt1.cols == dim &&
 		patt1.rows == dim);
 
-	auto channels = patt1.channels();
-	auto row_shift = overlay.y, col_shift = overlay.x;
+	const int channels = patt1.channels();
+	int row_shift = overlay.y, col_shift = overlay.x;
 
-	const auto row_start_1 = MAX(row_shift, 0);
-	const auto row_end_1 = MIN(row_shift + dim - 1, dim - 1) + 1;
-	auto col_start_1 = MAX(col_shift, 0);
-	auto col_end_1 = MIN(col_shift + dim - 1, dim - 1) + 1;
+	const int row_start_1 = MAX(row_shift, 0);
+	const int row_end_1 = MIN(row_shift + dim - 1, dim - 1) + 1;
+	int col_start_1 = MAX(col_shift, 0);
+	int col_end_1 = MIN(col_shift + dim - 1, dim - 1) + 1;
 
 	col_start_1 *= channels;
 	col_end_1 *= channels;
@@ -99,7 +99,7 @@ bool overlay_fit(const cv::Mat &patt1, const cv::Mat &patt2, Pair &overlay, char
 
 	int i, j;
 	const uchar* p1; const uchar* p2;
-	auto matching = true;
+	bool matching = true;
 	for (i = row_start_1; i < row_end_1 && matching; i++) {
 		p1 = patt1.ptr<uchar>(i);
 		p2 = patt2.ptr<uchar>(i - row_shift);
