@@ -56,12 +56,12 @@ public:
 };
 
 /**
- * \brief Generates an overlay of all possible intersecting overlays of two tiles
+ * \brief Generates an overlay of all possible intersecting overlays of two patterns
  */
 void generate_sliding_overlay(char dim, std::vector<pair> &out);
 
 /**
- * \brief Generates an overlay of the tiles shifted one unit to the top, bottom,
+ * \brief Generates an overlay of the patterns shifted one unit to the top, bottom,
  * left, and right.
  */
 void generate_neighbor_overlay(std::vector<pair> &out);

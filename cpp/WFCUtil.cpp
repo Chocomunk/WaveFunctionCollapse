@@ -59,10 +59,11 @@ bool patterns_equal(const cv::Mat &patt1, const cv::Mat &patt2) {
 		n_rows = 1;
 	}
 
+	// Checks each pixel value for equality
 	int i, j;
 	const uchar* p1; const uchar* p2;
 	bool matching = true;
-	for (i = 0; i < n_rows && matching; i++) {
+	for (i = 0; i < n_rows && matching; i++) {	
 		p1 = patt1.ptr<uchar>(i);
 		p2 = patt2.ptr<uchar>(i);
 		for (j = 0; j < n_cols && matching; j++) {
@@ -82,28 +83,35 @@ bool overlay_fit(const cv::Mat &patt1, const cv::Mat &patt2, pair &overlay, char
 		patt1.cols == dim &&
 		patt1.rows == dim);
 
+	/* 
+	 * Computes the range of indices at which to patt1 overlaps with patt2. Indices
+	 * are computed from the given overlay and are in terms of patt1 indexing.
+	 * To convert to patt2 indexing, subtract by the row/col shifts (shown blow).
+	 */
+	
 	const int channels = patt1.channels();
 	int row_shift = overlay.y, col_shift = overlay.x;
 
-	const int row_start_1 = MAX(row_shift, 0);
-	const int row_end_1 = MIN(row_shift + dim - 1, dim - 1) + 1;
-	int col_start_1 = MAX(col_shift, 0);
-	int col_end_1 = MIN(col_shift + dim - 1, dim - 1) + 1;
+	const int row_start = MAX(row_shift, 0);
+	const int row_end = MIN(row_shift + dim - 1, dim - 1) + 1;
+	int col_start = MAX(col_shift, 0);
+	int col_end = MIN(col_shift + dim - 1, dim - 1) + 1;
 
-	col_start_1 *= channels;
-	col_end_1 *= channels;
+	col_start *= channels;
+	col_end *= channels;
 	col_shift *= channels;
 
 	// Row equivalent for patt2 is {value} - row_shift
 	// Col equivalent for patt2 is {value} - col_shift
 
+	// Checks if the overlapping pixels are equal.
 	int i, j;
 	const uchar* p1; const uchar* p2;
 	bool matching = true;
-	for (i = row_start_1; i < row_end_1 && matching; i++) {
+	for (i = row_start; i < row_end && matching; i++) {
 		p1 = patt1.ptr<uchar>(i);
 		p2 = patt2.ptr<uchar>(i - row_shift);
-		for (j = col_start_1; j < col_end_1 && matching; j++) {
+		for (j = col_start; j < col_end && matching; j++) {
 			matching = p1[j] == p2[j-col_shift];
 		}
 	}

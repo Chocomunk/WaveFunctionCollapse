@@ -5,11 +5,12 @@
 #include "WFCUtil.h"
 
 /* Dimension legend
-Tile count: T
-Pattern dim: N
-Overlay counts: O
-Wave shape x: WX
-Wave shape y: WY
+	Template counts: T
+	Pattern counts: N
+	Tile/Pattern dim: D
+	Overlay counts: O
+	Wave shape x: WX
+	Wave shape y: WY
 */
 
 class Model {
@@ -23,9 +24,27 @@ public:
 	pair wave_shape;
 	pair num_patt_2d;
 
-	std::vector<cv::Mat> tiles;					// Shape: [T]
-	std::vector<cv::Mat> patterns;				// Shape: [N]
-	std::vector<pair> overlays;					// Shape: [O]
+	/**
+	 * \brief The set of input images to use as templates.
+	 * 
+	 * Shape: [T]
+	 */
+	std::vector<cv::Mat> templates;
+
+	/**
+	 * \brief The set of patterns/tiles taken from the input templates
+	 *
+	 * Shape: [N]
+	 */
+	std::vector<cv::Mat> patterns;
+	
+	/**
+	 * \brief The set of overlays describing how to compare two patterns. Stored
+	 * as an (x,y) shift.
+	 *
+	 * Shape: [O]
+	 */
+	std::vector<pair> overlays;
 
 	cv::Mat out_img;
 
@@ -33,14 +52,58 @@ private:
 	int stack_index_ = 0;
 	bool periodic_;
 
-	std::vector<waveform> propagate_stack_;		// Shape: [WX * WY * N]
+	/**
+	 * \brief Fixed-space workspace stack for propagation step.
+	 *
+	 * Shape: [WX * WY * N]
+	 */
+	std::vector<waveform> propagate_stack_;
 
-	std::vector<int> counts_;					// Shape: [N]
-	std::vector<int> entropy_;					// Shape: [WX, WY]
-	std::vector<std::vector<int>> fit_table_;	// Shape: [N, O]
-	std::vector<char> waves_;					// Shape: [WX, WY, N]
-	std::vector<int> observed_;					// Shape: [WX, WY]
-	std::vector<int> compatible_neighbors_;		// Shape: [WX, WY, N, O]
+	/**
+	 * \brief Store the number of times each pattern occurs in the template image.
+	 *
+	 * Shape: [N]
+	 */
+	std::vector<int> counts_;
+
+	/**
+	 * \brief Stores the entropy (number of valid patterns) for a given position.
+	 *
+	 * Shape: [WX, WY]
+	 */
+	std::vector<int> entropy_;
+
+	/**
+	 * \brief Stores the set of allowed patterns for a given center pattern and
+	 * overlay. Stored like an adjacency list.
+	 *
+	 * Shape: [N, O][*]
+	 */
+	std::vector<std::vector<int>> fit_table_;
+
+	/**
+	 * \brief Stores whether a specific waveform (position, state) is allowed
+	 * (true/false).
+	 *
+	 * Shape: [WX, WY, N]
+	 */
+	std::vector<char> waves_;
+
+	/**
+	 * \brief Stores the index of the final collapsed pattern for a given position.
+	 *
+	 * Shape: [WX, WY]
+	 */
+	std::vector<int> observed_;
+
+	/**
+	 * \brief Stores a count of the number of compatible neighbors for this pattern.
+	 * If there are no compatible neighbors, then it is impossible for this pattern
+	 * to occur and we should ban it.
+	 *
+	 * Shape: [WX, WY, N, O]
+	 */
+	std::vector<int> compatible_neighbors_;
 
 public:
 	/**
@@ -108,13 +171,13 @@ private:
 	void ban_waveform(waveform& wave);
 
 	/**
-	 * \brief Adds all (N x N) tiles in the input images. A (5 x 3) input
-	 * image has 3 (3 x 3) considered tiles.
+	 * \brief Adds all (D x D) tiles in the input image to the internal set of
+	 * pattern/states. A (5 x 3) input image has 3 (3 x 3) considered tiles.
 	 */
 	void create_waveforms(bool rotate_patterns);
 	
 	/**
-	 * \brief Adds the given (N x N) tile, to the internal set of patterns/states.
+	 * \brief Adds the given (D x D) tile, to the internal set of patterns/states.
 	 * Duplicates are counted to keep track of the frequencies of unique patterns.
 	 */
 	void add_pattern(const cv::Mat &pattern);
