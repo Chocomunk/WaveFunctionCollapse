@@ -1,4 +1,6 @@
 #include "Model.h"
+#include "Input.h"
+#include "WFCUtil.h"
 
 Model::Model(const std::string tile_dir, Pair &output_shape, const char dim, std::vector<Pair> &overlays, const bool rotate_patterns, const bool periodic, const int iteration_limit) : 
 periodic_(periodic), dim(dim), iteration_limit(iteration_limit), overlay_count(overlays.size()), img_shape(output_shape), overlays(overlays) {

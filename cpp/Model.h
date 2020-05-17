@@ -1,11 +1,8 @@
+#pragma once
 #include <string>
 #include <vector>
-#include <bitset>
 #include <opencv2/opencv.hpp>
-#include <stack>
-#include "Input.h"
 #include "WFCUtil.h"
-#include <random>
 
 /* Documentation legend
 Tile count: T
