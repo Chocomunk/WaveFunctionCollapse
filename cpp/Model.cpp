@@ -4,7 +4,7 @@
 
 Model::Model(pair &output_shape, std::vector<cv::Mat> &templates, const char dim, 
 	std::vector<pair> &overlays, const bool rotate_patterns, const bool periodic, 
-	const int iteration_limit) : 
+	const int iteration_limit) :
 templates(templates), dim(dim), periodic_(periodic), iteration_limit(iteration_limit), overlay_count(overlays.size()),
 img_shape(output_shape), overlays(overlays) {
 	create_waveforms(rotate_patterns);
@@ -203,9 +203,8 @@ void Model::stack_waveform(waveform& wave) {
 }
 
 waveform Model::pop_waveform() {
-	const waveform out = propagate_stack_[stack_index_-1];
 	stack_index_-=1;
-	return out;
+	return propagate_stack_[stack_index_];
 }
 
 void Model::ban_waveform(waveform& wave)

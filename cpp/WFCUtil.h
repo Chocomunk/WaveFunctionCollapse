@@ -36,7 +36,7 @@ struct waveform
 	pair pos; int state;
 
 public:
-	waveform(pair pos, int state);
+	waveform(pair pos = { 0,0 }, int state = 0);
 };
 
 /**
