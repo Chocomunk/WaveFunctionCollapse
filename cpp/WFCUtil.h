@@ -1,29 +1,47 @@
 #pragma once
 #include <vector>
-#include <opencv2\opencv.hpp>
+#include <opencv2/opencv.hpp>
 
-struct Pair {
+/**
+ * \brief Represents a pair of integral values.
+ */
+struct pair {
 	size_t x; size_t y; size_t size;
 
 public:
-	explicit Pair(size_t x=0, size_t y=0);
-	friend std::ostream& operator<<(std::ostream& os, const Pair& obj);
-	inline Pair operator+(const Pair& other) const;
-	inline Pair operator+(const size_t val) const;
-	inline Pair operator%(const Pair& other) const;
-	inline bool operator<(const Pair& other) const;
+	pair(size_t x=0, size_t y=0);
+	
+	/**
+	 * \return True if neither x nor y are negative, False otherwise
+	 */
 	inline bool non_negative() const;
-	inline bool shifted_less_than(const Pair& other, const size_t shift) const;
+	
+	/**
+	 * \return True if '(this + shift) < other', False otherwise
+	 */
+	inline bool shifted_less_than(const pair& other, const size_t shift) const;
+
+	friend std::ostream& operator<<(std::ostream& os, const pair& obj);
+	inline pair operator+(const pair& other) const;
+	inline pair operator+(const size_t val) const;
+	inline pair operator%(const pair& other) const;
+	inline bool operator<(const pair& other) const;
 };
 
-struct WaveForm
+/**
+ * \brief Represents a wave state at position 'pair(x,y)' in state 'state'
+ */
+struct waveform
 {
-	Pair wave; int pattern;
+	pair pos; int state;
 
 public:
-	WaveForm(Pair wave = Pair(0,0), int pattern = 0);
+	waveform(pair pos, int state);
 };
 
+/**
+ * \brief Represents a pixel color value
+ */
 struct BGR final
 {
 	uchar b;
@@ -37,51 +55,72 @@ public:
 	void operator+=(BGR& other);
 };
 
-void generate_sliding_overlay(char dim, std::vector<Pair> &out);
-void generate_neighbor_overlay(std::vector<Pair> &out);
+/**
+ * \brief Generates an overlay of all possible intersecting overlays of two tiles
+ */
+void generate_sliding_overlay(char dim, std::vector<pair> &out);
 
+/**
+ * \brief Generates an overlay of the tiles shifted one unit to the top, bottom,
+ * left, and right.
+ */
+void generate_neighbor_overlay(std::vector<pair> &out);
+
+/**
+ * \return True if both patterns have the same pixel values
+ */
 bool patterns_equal(const cv::Mat &patt1, const cv::Mat &patt2);
-bool overlay_fit(const cv::Mat &patt1, const cv::Mat &patt2, Pair &overlay, char dim);
 
-inline int get_idx(Pair &idx, Pair &dim, int depth, int depth_idx);
+/**
+ * \return True if we can lay patt2 on patt1 with the given overlay position
+ */
+bool overlay_fit(const cv::Mat &patt1, const cv::Mat &patt2, pair &overlay, char dim);
+
+/**
+ * \return The effective index of the flattened [dim.x, dim.y, depth] array.
+ */
+inline int get_idx(pair &idx, pair &dim, int depth, int depth_idx);
+
+/**
+ * \return A random integer within [0, max_val)
+ */
 int rand_int(int max_val);
 
 
-inline Pair Pair::operator+(const Pair& other) const
+inline bool pair::non_negative() const
 {
-	return Pair(this->x + other.x, this->y + other.y);
+	return this->x >= 0 && this->y >= 0;
 }
 
-inline Pair Pair::operator+(const size_t val) const
+inline bool pair::shifted_less_than(const pair& other, const size_t shift) const
 {
-	return Pair(this->x + val, this->y + val);
+	return this->x + shift < other.x && this->y + shift < other.y;
 }
 
-inline Pair Pair::operator%(const Pair& other) const
+inline int get_idx(pair &idx, pair &dim, int depth, int depth_idx) {
+	return idx.y * dim.x * depth + idx.x * depth + depth_idx;
+}
+inline pair pair::operator+(const pair& other) const
+{
+	return pair(this->x + other.x, this->y + other.y);
+}
+
+inline pair pair::operator+(const size_t val) const
+{
+	return pair(this->x + val, this->y + val);
+}
+
+inline pair pair::operator%(const pair& other) const
 {
 	auto x=this->x, y=this->y;
 	if (x >= other.x) x -= other.x;
 	if (x < 0) x += other.x;
 	if (y >= other.y) y -= other.y;
 	if (y < 0) y += other.y;
-	return Pair(x, y);
+	return pair(x, y);
 }
 
-inline bool Pair::operator<(const Pair& other) const
+inline bool pair::operator<(const pair& other) const
 {
 	return this->x < other.x && this->y < other.y;
-}
-
-inline bool Pair::non_negative() const
-{
-	return this->x >= 0 && this->y >= 0;
-}
-
-inline bool Pair::shifted_less_than(const Pair& other, const size_t shift) const
-{
-	return this->x + shift < other.x && this->y + shift < other.y;
-}
-
-inline int get_idx(Pair &idx, Pair &dim, int depth, int depth_idx) {
-	return idx.y * dim.x * depth + idx.x * depth + depth_idx;
 }

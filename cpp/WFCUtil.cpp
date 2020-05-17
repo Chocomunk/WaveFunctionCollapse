@@ -1,13 +1,13 @@
 #include "WFCUtil.h"
 
-Pair::Pair(size_t x, size_t y) : x(x), y(y), size(x * y) {}
+pair::pair(size_t x, size_t y) : x(x), y(y), size(x * y) {}
 
-std::ostream& operator<<(std::ostream& os, const Pair& obj) {
+std::ostream& operator<<(std::ostream& os, const pair& obj) {
 	os << "(" << obj.x << ", " << obj.y << ")";
 	return os;
 }
 
-WaveForm::WaveForm(const Pair wave, const int pattern): wave(wave), pattern(pattern){}
+waveform::waveform(const pair pos, const int state): pos(pos), state(state){}
 
 BGR::BGR(const uchar b, const uchar g, const uchar r) : b(b), g(g), r(r) {}
 
@@ -27,7 +27,7 @@ void BGR::operator+=(BGR& other) {
 	this->r += other.r;
 }
 
-void generate_sliding_overlay(const char dim, std::vector<Pair> &out) {
+void generate_sliding_overlay(const char dim, std::vector<pair> &out) {
 	for (int i = 1 - dim; i < dim; i++) {
 		for (int j = 1 - dim; j < dim; j++) {
 			if (i != 0 || j != 0) {
@@ -37,7 +37,7 @@ void generate_sliding_overlay(const char dim, std::vector<Pair> &out) {
 	}
 }
 
-void generate_neighbor_overlay(std::vector<Pair> &out) {
+void generate_neighbor_overlay(std::vector<pair> &out) {
 	out.clear();
 	out.emplace_back(-1,  0);
 	out.emplace_back(0,  1);
@@ -73,7 +73,7 @@ bool patterns_equal(const cv::Mat &patt1, const cv::Mat &patt2) {
 	return matching;
 }
 
-bool overlay_fit(const cv::Mat &patt1, const cv::Mat &patt2, Pair &overlay, char dim) {
+bool overlay_fit(const cv::Mat &patt1, const cv::Mat &patt2, pair &overlay, char dim) {
 	CV_Assert(patt1.depth() == patt2.depth() &&
 		patt1.depth() == CV_8U &&
 		patt1.channels() == patt2.channels() &&

@@ -6,9 +6,9 @@
 //#define SHOWPATTS
 
 int main() {
-	std::vector<Pair> overlays;
+	std::vector<pair> overlays;
 	generate_neighbor_overlay(overlays);
-	Model model(TILES_DIR, Pair(64, 64), 3, overlays, true, true, -1);
+	Model model(pair(64, 64), TILES_DIR, 3, overlays, true, true, -1);
 	
 #ifdef SHOWPATTS
 	bool break_all = false;
@@ -24,8 +24,8 @@ int main() {
 			size_t index = pat_idx1 * model.overlay_count + overlay_idx;
 			size_t opposite_idx = pat_idx1 * model.overlay_count + ((overlay_idx + 2) % model.overlay_count);
 			auto valid_patterns = model.fit_table_[index];
-			Pair overlay = overlays[overlay_idx];
-			Pair opposite = overlays[(overlay_idx + 2) % model.overlay_count];
+			pair overlay = overlays[overlay_idx];
+			pair opposite = overlays[(overlay_idx + 2) % model.overlay_count];
 			std::cout << "Valid Patterns: ";
 			for (int pattern_2: valid_patterns)	std::cout << pattern_2 << ", ";
 			std::cout << std::endl;

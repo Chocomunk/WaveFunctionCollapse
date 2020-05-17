@@ -2,18 +2,20 @@
 #include "Input.h"
 #include "WFCUtil.h"
 
-Model::Model(const std::string tile_dir, Pair &output_shape, const char dim, std::vector<Pair> &overlays, const bool rotate_patterns, const bool periodic, const int iteration_limit) : 
-periodic_(periodic), dim(dim), iteration_limit(iteration_limit), overlay_count(overlays.size()), img_shape(output_shape), overlays(overlays) {
+Model::Model(pair &output_shape, const std::string tile_dir, const char dim, std::vector<pair> &overlays, 
+	const bool rotate_patterns, const bool periodic, const int iteration_limit) : 
+dim(dim), periodic_(periodic), iteration_limit(iteration_limit), overlay_count(overlays.size()),
+img_shape(output_shape), overlays(overlays) {
 	load_tiles(tile_dir, tiles);
 	create_waveforms(rotate_patterns);
 
 	srand(time(nullptr));
 
 	num_patterns = patterns.size();
-	num_patt_2d = Pair(num_patterns, num_patterns);
-	wave_shape = Pair(img_shape.x + 1 - dim, img_shape.y + 1 - dim);
+	num_patt_2d = pair(num_patterns, num_patterns);
+	wave_shape = pair(img_shape.x + 1 - dim, img_shape.y + 1 - dim);
 
-	propagate_stack_ = std::vector<WaveForm>(wave_shape.size * num_patterns);
+	propagate_stack_ = std::vector<waveform>(wave_shape.size * num_patterns);
 	entropy_ = std::vector<int>(wave_shape.size);
 	waves_ = std::vector<char>(wave_shape.size * num_patterns);
 	observed_ = std::vector<int>(wave_shape.size);
@@ -31,7 +33,7 @@ periodic_(periodic), dim(dim), iteration_limit(iteration_limit), overlay_count(o
 void Model::generate_image() {
 	std::cout << "Called Generate" << std::endl;
 	clear();
-	Pair lowest_entropy_idx = Pair(rand_int(wave_shape.x), rand_int(wave_shape.y));
+	pair lowest_entropy_idx = pair(rand_int(wave_shape.x), rand_int(wave_shape.y));
 	int iteration = 0;
 	while ((iteration_limit < 0 || iteration < iteration_limit) && lowest_entropy_idx.non_negative()) {
 		observe_wave(lowest_entropy_idx);
@@ -56,7 +58,7 @@ cv::Mat& Model::get_image() {
 	return out_img;
 }
 
-void Model::get_lowest_entropy(Pair &idx) {
+void Model::get_lowest_entropy(pair &idx) {
 	int r = -1; int c = -1;
 	int lowest_entropy = -1;
 	const size_t waves_count = wave_shape.size;
@@ -94,8 +96,8 @@ void Model::render_superpositions(const int row, const int col) {
 	}
 }
 
-void Model::observe_wave(Pair &wave) {
-	const int idx_row_col_patt_base = get_idx(wave, wave_shape, num_patterns, 0);
+void Model::observe_wave(pair &pos) {
+	const int idx_row_col_patt_base = get_idx(pos, wave_shape, num_patterns, 0);
 	int possible_patterns_sum = 0;
 	std::vector<int> possible_indices;
 	for (size_t i = 0; i < num_patterns; i++) {
@@ -115,43 +117,40 @@ void Model::observe_wave(Pair &wave) {
 	}
 	collapsed_index -= 1;	// Counter-action against additional increment from for-loop
 
-	for (size_t patt_idx = 0; patt_idx < num_patterns; patt_idx++)
-		if (waves_[idx_row_col_patt_base + patt_idx] != (patt_idx == collapsed_index)) ban_waveform(wave, patt_idx);
-	observed_[get_idx(wave, wave_shape, 1, 0)] = collapsed_index;
+	for (int patt_idx = 0; patt_idx < num_patterns; patt_idx++) {
+		if (waves_[idx_row_col_patt_base + patt_idx] != (patt_idx == collapsed_index)) 
+			ban_waveform(waveform(pos, patt_idx));
+	}
+	observed_[get_idx(pos, wave_shape, 1, 0)] = collapsed_index;
 }
 
 void Model::propagate() {
 	int iterations = 0;
 	while (stack_index_ > 0) {
-		const WaveForm waveform = pop_waveform();
-		Pair wave = waveform.wave;
-		const int pattern_i = waveform.pattern;
+		const waveform wave_f = pop_waveform();
+		pair wave = wave_f.pos;
+		const int pattern_i = wave_f.state;
 
-		for(size_t overlay=0; overlay < overlay_count; overlay++)
-		{
-			Pair wave_o;
-			if (periodic_)
-			{
+		for(size_t overlay=0; overlay < overlay_count; overlay++) {
+			pair wave_o;
+			if (periodic_) {
 				wave_o = (wave + overlays[overlay])%wave_shape;
-			} else
-			{
+			} else {
 				wave_o = wave + overlays[overlay];
 			}
 
 			const int wave_o_i = get_idx(wave_o, wave_shape, num_patterns, 0);
 			const int wave_o_i_base = get_idx(wave_o, wave_shape, 1, 0);
 
-			if (wave_o.non_negative() && wave_o < wave_shape && entropy_[wave_o_i_base] > 1 )
-			{
+			if (wave_o.non_negative() && wave_o < wave_shape && entropy_[wave_o_i_base] > 1 ) {
 				auto valid_patterns = fit_table_[pattern_i * overlay_count + overlay];
-				for (int pattern_2: valid_patterns)
-				{
-					if(waves_[wave_o_i + pattern_2])
-					{
+				for (int pattern_2: valid_patterns)	{
+					if(waves_[wave_o_i + pattern_2]) {
 						// Get opposite overlay
 						const int compat_idx = (wave_o_i + pattern_2)*overlay_count + overlay;
 						compatible_neighbors_[compat_idx]--;
-						if (compatible_neighbors_[compat_idx] == 0) ban_waveform(wave_o, pattern_2);
+						if (compatible_neighbors_[compat_idx] == 0) 
+							ban_waveform(waveform(wave_o, pattern_2));
 					}
 				}
 			}
@@ -163,40 +162,36 @@ void Model::propagate() {
 	}
 }
 
-void Model::stack_waveform(WaveForm& waveform) {
-	propagate_stack_[stack_index_] = waveform;
+void Model::stack_waveform(waveform& wave) {
+	propagate_stack_[stack_index_] = wave;
 	stack_index_+=1;
 }
 
-WaveForm Model::pop_waveform() {
-	const WaveForm out = propagate_stack_[stack_index_-1];
+waveform Model::pop_waveform() {
+	const waveform out = propagate_stack_[stack_index_-1];
 	stack_index_-=1;
 	return out;
 }
 
-void Model::ban_waveform(Pair& wave, const int pattern_i)
+void Model::ban_waveform(waveform& wave)
 {
-	const int waves_idx = get_idx(wave, wave_shape, num_patterns, pattern_i);
-	const int wave_i = get_idx(wave, wave_shape, 1, 0);
+	const int waves_idx = get_idx(wave.pos, wave_shape, num_patterns, wave.state);
+	const int wave_i = get_idx(wave.pos, wave_shape, 1, 0);
 	waves_[waves_idx] = false;
-	for (size_t overlay=0; overlay < overlay_count; overlay++)
-	{
+	for (size_t overlay=0; overlay < overlay_count; overlay++) {
 		compatible_neighbors_[waves_idx*overlay_count + overlay] = 0;
 	}
-	stack_waveform(WaveForm(wave, pattern_i));
+	stack_waveform(wave);
 
 	entropy_[wave_i] -= 1;
 }
 
 void Model::clear()
 {
-	for (size_t wave = 0; wave < wave_shape.size; wave++)
-	{
-		for (size_t patt = 0; patt < num_patterns; patt++)
-		{
+	for (size_t wave = 0; wave < wave_shape.size; wave++) {
+		for (size_t patt = 0; patt < num_patterns; patt++) {
 			waves_[wave * num_patterns + patt] = true;
-			for (size_t overlay=0; overlay < overlay_count; overlay++)
-			{
+			for (size_t overlay=0; overlay < overlay_count; overlay++) {
 				// Set count of compatible neighbors to length of valid patterns in the fit table
 				compatible_neighbors_[(wave*num_patterns + patt)*overlay_count + overlay] = fit_table_[patt*overlay_count + (overlay + 2)%overlay_count].size();
 			}
@@ -214,38 +209,38 @@ void Model::create_waveforms(const bool rotate_patterns) {
 		for (int col = 0; col < width + 1 - dim; col++) {
 			for (int row = 0; row < height + 1 - dim; row++) {
 				auto pattern = tile(cv::Rect(col, row, dim, dim));
-				add_waveform(pattern);
+				add_pattern(pattern);
 				if (rotate_patterns) {
 					cv::Mat cpy;
 					cv::rotate(pattern, cpy, cv::ROTATE_90_COUNTERCLOCKWISE);
-					add_waveform(cpy);
+					add_pattern(cpy);
 					cv::Mat cpy1;
 					cv::rotate(pattern, cpy1, cv::ROTATE_180);
-					add_waveform(cpy1);
+					add_pattern(cpy1);
 					cv::Mat cpy2;
 					cv::rotate(pattern, cpy2, cv::ROTATE_90_CLOCKWISE);
-					add_waveform(cpy2);
+					add_pattern(cpy2);
 				}
 			}
 		}
 	}
 }
 
-void Model::add_waveform(const cv::Mat &waveform) {
+void Model::add_pattern(const cv::Mat &pattern) {
 	const size_t curr_patt_count = patterns.size();
 	for (size_t i = 0; i < curr_patt_count; i++) {
-		if (patterns_equal(waveform, patterns[i])) {
+		if (patterns_equal(pattern, patterns[i])) {
 			counts_[i] += 1;
 			return;
 		}
 	}
-	patterns.push_back(waveform);
+	patterns.push_back(pattern);
 	counts_.push_back(1);
 }
 
 void Model::generate_fit_table() {
 	for (const cv::Mat& center_pattern : patterns) {
-		for (Pair overlay : overlays) {
+		for (pair overlay : overlays) {
 			std::vector<int> valid_patterns;
 			for (size_t i = 0; i < num_patterns; i++) {
 				if (overlay_fit(center_pattern, patterns[i], overlay, dim))
