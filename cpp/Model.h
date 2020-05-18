@@ -24,29 +24,6 @@ public:
 private:
 	int stack_index_ = 0;
 	bool periodic_;
-	
-	/**
-	 * \brief The set of overlays describing how to compare two patterns. Stored
-	 * as an (x,y) shift.
-	 *
-	 * Shape: [O]
-	 */
-	//std::vector<pair>& overlays;
-
-	/**
-	 * \brief Store the number of times each pattern occurs in the template image.
-	 *
-	 * Shape: [N]
-	 */
-	//std::vector<int>& counts;
-
-	/**
-	 * \brief Stores the set of allowed patterns for a given center pattern and
-	 * overlay. Stored like an adjacency list.
-	 *
-	 * Shape: [N, O][*]
-	 */
-	//std::vector<std::vector<int>>& fit_table;
 
 	/**
 	 * \brief Fixed-space workspace stack for propagation step.
