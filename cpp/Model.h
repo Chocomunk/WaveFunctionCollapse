@@ -1,7 +1,5 @@
 #pragma once
-#include <string>
 #include <vector>
-#include <opencv2/opencv.hpp>
 #include "WFCUtil.h"
 
 /* Dimension legend
@@ -20,23 +18,12 @@ public:
 	const int iteration_limit;
 	size_t num_patterns;
 	size_t overlay_count;
-	pair img_shape;
 	pair wave_shape;
 	pair num_patt_2d;
 
-	/**
-	 * \brief The set of input images to use as templates.
-	 * 
-	 * Shape: [T]
-	 */
-	std::vector<cv::Mat> templates;
-
-	/**
-	 * \brief The set of patterns/tiles taken from the input templates
-	 *
-	 * Shape: [N]
-	 */
-	std::vector<cv::Mat> patterns;
+private:
+	int stack_index_ = 0;
+	bool periodic_;
 	
 	/**
 	 * \brief The set of overlays describing how to compare two patterns. Stored
@@ -44,13 +31,22 @@ public:
 	 *
 	 * Shape: [O]
 	 */
-	std::vector<pair> overlays;
+	//std::vector<pair>& overlays;
 
-	cv::Mat out_img;
+	/**
+	 * \brief Store the number of times each pattern occurs in the template image.
+	 *
+	 * Shape: [N]
+	 */
+	//std::vector<int>& counts;
 
-private:
-	int stack_index_ = 0;
-	bool periodic_;
+	/**
+	 * \brief Stores the set of allowed patterns for a given center pattern and
+	 * overlay. Stored like an adjacency list.
+	 *
+	 * Shape: [N, O][*]
+	 */
+	//std::vector<std::vector<int>>& fit_table;
 
 	/**
 	 * \brief Fixed-space workspace stack for propagation step.
@@ -60,26 +56,11 @@ private:
 	std::vector<waveform> propagate_stack_;
 
 	/**
-	 * \brief Store the number of times each pattern occurs in the template image.
-	 *
-	 * Shape: [N]
-	 */
-	std::vector<int> counts_;
-
-	/**
 	 * \brief Stores the entropy (number of valid patterns) for a given position.
 	 *
 	 * Shape: [WX, WY]
 	 */
 	std::vector<int> entropy_;
-
-	/**
-	 * \brief Stores the set of allowed patterns for a given center pattern and
-	 * overlay. Stored like an adjacency list.
-	 *
-	 * Shape: [N, O][*]
-	 */
-	std::vector<std::vector<int>> fit_table_;
 
 	/**
 	 * \brief Stores whether a specific waveform (position, state) is allowed
@@ -109,26 +90,26 @@ public:
 	/**
 	 * \brief Initializes a model instance and allocates all workspace data.
 	 */
-	Model(pair &output_shape, std::vector<cv::Mat> &templates, char dim, std::vector<pair> &overlays, 
-		  bool rotate_patterns=false, bool periodic=false, int iteration_limit=-1);
+	Model(pair &output_shape, const int num_patterns, const int overlay_count, 
+		const char dim, const bool periodic=false, const int iteration_limit=-1);
 	
 	/**
 	 * \brief Runs the WFC algorithm and stores the output image (call 'get_image'
 	 * to access).
 	 */
-	void generate_image();
+	void generate(std::vector<pair> &overlays, std::vector<int> &counts, std::vector<std::vector<int>> &fit_table);
+	
+	/**
+	 * \brief Generates an image of the superpositions of the wave at (row, col),
+	 * and stores the result in the output image.
+	 */
+	void get_superposition(int row, int col, std::vector<int> &patt_idxs);
 	
 	/**
 	 * \brief Resets all tiles to a perfect superposition.
 	 */
-	void clear();
+	void clear(std::vector<std::vector<int>> &fit_table);
 	
-	/**
-	 * \return The stored output image (may be blank if 'generate_image' has not
-	 * been called).
-	 */
-	cv::Mat& get_image();
-
 private:
 	/**
 	 * \brief Finds the wave with lowest entropy and stores it's position in idx
@@ -136,22 +117,16 @@ private:
 	void get_lowest_entropy(pair &idx);
 	
 	/**
-	 * \brief Generates an image of the superpositions of the wave at (row, col),
-	 * and stores the result in the output image.
-	 */
-	void render_superpositions(int row, int col);
-	
-	/**
 	 * \brief Performs an observation on the wave at the given position and
 	 * collapses it to a single state.
 	 */
-	void observe_wave(pair &pos);
+	void observe_wave(pair &pos, std::vector<int> &counts);
 	
 	/**
 	 * \brief Iteratively collapses waves in the tilemap until no conflicts exist.
 	 * Meant to be used after collapsing a wave by observing it.
 	 */
-	void propagate();
+	void propagate(std::vector<pair>& overlays, std::vector<std::vector<int>> &fit_table);
 
 	/**
 	 * \brief Adds a wave to the propagation stack to propagate changes to it's
@@ -169,22 +144,4 @@ private:
 	 * the overall state at that position and reduces it's entropy.
 	 */
 	void ban_waveform(waveform& wave);
-
-	/**
-	 * \brief Adds all (D x D) tiles in the input image to the internal set of
-	 * pattern/states. A (5 x 3) input image has 3 (3 x 3) considered tiles.
-	 */
-	void create_waveforms(bool rotate_patterns);
-	
-	/**
-	 * \brief Adds the given (D x D) tile, to the internal set of patterns/states.
-	 * Duplicates are counted to keep track of the frequencies of unique patterns.
-	 */
-	void add_pattern(const cv::Mat &pattern);
-	
-	/**
-	 * \brief Given the internal set of patterns/states, generates the overlay
-	 * constraints (can be/cannot be overlayed) for every pair of states.
-	 */
-	void generate_fit_table();
 };

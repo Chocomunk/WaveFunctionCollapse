@@ -45,33 +45,21 @@ void generate_neighbor_overlay(std::vector<pair> &out) {
 	out.emplace_back(0, -1);
 }
 
-bool patterns_equal(const cv::Mat &patt1, const cv::Mat &patt2) {
-	CV_Assert(patt1.depth() == patt2.depth() &&
-		patt1.depth() == CV_8U &&
-		patt1.channels() == patt2.channels() &&
-		patt1.cols == patt2.cols && patt1.rows == patt2.rows);
-	const int channels = patt1.channels();
-	int n_rows = patt1.rows;
-	int n_cols = patt1.cols * channels;
-
-	if (patt1.isContinuous() && patt2.isContinuous()) {
-		n_cols *= n_rows;
-		n_rows = 1;
-	}
-
-	// Checks each pixel value for equality
-	int i, j;
-	const uchar* p1; const uchar* p2;
-	bool matching = true;
-	for (i = 0; i < n_rows && matching; i++) {	
-		p1 = patt1.ptr<uchar>(i);
-		p2 = patt2.ptr<uchar>(i);
-		for (j = 0; j < n_cols && matching; j++) {
-			matching = p1[j] == p2[j];
+void generate_fit_table(const std::vector<cv::Mat> &patterns, const std::vector<pair> &overlays, 
+	const int dim, std::vector<std::vector<int>> &fit_table) {
+	size_t num_patterns = patterns.size();
+	for (const cv::Mat& center_pattern : patterns) {
+		for (pair overlay : overlays) {
+			std::vector<int> valid_patterns;
+			for (size_t i = 0; i < num_patterns; i++) {
+				if (overlay_fit(center_pattern, patterns[i], overlay, dim))
+				{
+					valid_patterns.push_back(i);
+				}
+			}
+			fit_table.push_back(valid_patterns);
 		}
 	}
-
-	return matching;
 }
 
 bool overlay_fit(const cv::Mat &patt1, const cv::Mat &patt2, pair &overlay, char dim) {

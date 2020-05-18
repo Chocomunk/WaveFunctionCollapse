@@ -1,18 +1,42 @@
 #include "Input.h"
 #include "Model.h"
+#include "WFCUtil.h"
+#include "Output.h"
 #include <opencv2/opencv.hpp>
 
 #define TILES_DIR "../../../tiles/spirals"
+#define TILE_DIM 3
+#define ROTATE true
+#define PERIODIC true
+#define WIDTH 64
+#define HEIGHT 64
 //#define SHOWPATTS
 
 int main() {
+	// The set of overlays describing how to compare two patterns. Stored
+	// as an (x,y) shift. Shape: [O]
 	std::vector<pair> overlays;
 	generate_neighbor_overlay(overlays);
+	
+	// The set of input images to use as templates. Shape: [T]
 	std::vector<cv::Mat> template_imgs;
 	load_tiles(TILES_DIR, template_imgs);
-	Model model(pair(64, 64), template_imgs, 3, overlays, 
-		true, true, -1);
+
+
+	// The set of patterns/tiles taken from the input templates. Shape: [N]
+	std::vector<cv::Mat> patterns;
+	std::vector<int> counts;
+	create_waveforms(template_imgs, TILE_DIM, ROTATE, patterns, counts);
+
+	// Stores the set of allowed patterns for a given center pattern and
+	// overlay. Stored like an adjacency list. Shape: [N, O][*]
+	std::vector<std::vector<int>> fit_table;
+	generate_fit_table(patterns, overlays, TILE_DIM, fit_table);
 	
+	Model model(pair(WIDTH, HEIGHT), 
+		patterns.size(), overlays.size(), 
+		TILE_DIM, PERIODIC);
+
 #ifdef SHOWPATTS
 	bool break_all = false;
 	std::cout << std::endl;
@@ -21,12 +45,12 @@ int main() {
 		cv::Mat scaled1;
 		auto patt1 = model.patterns[pat_idx1];
 		cv::resize(patt1, scaled1, cv::Size(128, 128), 0.0, 0.0, cv::INTER_AREA);
-		std::cout << "Pattern: " << pat_idx1 << " | Pattern count: " << model.counts_[pat_idx1] << std::endl;
+		std::cout << "Pattern: " << pat_idx1 << " | Pattern count: " << model.counts[pat_idx1] << std::endl;
 		
 		for (size_t overlay_idx = 0; overlay_idx < model.overlay_count; overlay_idx++) {
 			size_t index = pat_idx1 * model.overlay_count + overlay_idx;
 			size_t opposite_idx = pat_idx1 * model.overlay_count + ((overlay_idx + 2) % model.overlay_count);
-			auto valid_patterns = model.fit_table_[index];
+			auto valid_patterns = model.fit_table[index];
 			pair overlay = overlays[overlay_idx];
 			pair opposite = overlays[(overlay_idx + 2) % model.overlay_count];
 			std::cout << "Valid Patterns: ";
@@ -71,8 +95,13 @@ int main() {
 	}
 #endif // SHOWPATTS
 
-	model.generate_image();
-	auto result = model.get_image();
+	model.generate(overlays, counts, fit_table);
+
+	// Initialize blank output image
+	cv::Mat result = cv::Mat(WIDTH, WIDTH, template_imgs[0].type());
+
+	render_image(model, patterns, result, WIDTH, HEIGHT, TILE_DIM);
+	
 	cv::resize(result, result, cv::Size(800, 800), 0.0, 0.0, cv::INTER_AREA);
 	cv::imshow("result", result);
 	cv::waitKey(0);

@@ -67,9 +67,16 @@ void generate_sliding_overlay(char dim, std::vector<pair> &out);
 void generate_neighbor_overlay(std::vector<pair> &out);
 
 /**
- * \return True if both patterns have the same pixel values
+ * \return The effective index of the flattened [dim.x, dim.y, depth] array.
  */
-bool patterns_equal(const cv::Mat &patt1, const cv::Mat &patt2);
+inline int get_idx(pair &idx, pair &dim, int depth, int depth_idx);
+	
+/**
+ * \brief Given the internal set of patterns/states, generates the overlay
+ * constraints (can be/cannot be overlayed) for every pair of states.
+ */
+void generate_fit_table(const std::vector<cv::Mat> &patterns, const std::vector<pair> &overlays, 
+	const int dim, std::vector<std::vector<int>> &fit_table);
 
 /**
  * \return True if we can lay patt2 on patt1 with the given overlay position
@@ -77,15 +84,9 @@ bool patterns_equal(const cv::Mat &patt1, const cv::Mat &patt2);
 bool overlay_fit(const cv::Mat &patt1, const cv::Mat &patt2, pair &overlay, char dim);
 
 /**
- * \return The effective index of the flattened [dim.x, dim.y, depth] array.
- */
-inline int get_idx(pair &idx, pair &dim, int depth, int depth_idx);
-
-/**
  * \return A random integer within [0, max_val)
  */
 int rand_int(int max_val);
-
 
 inline bool pair::non_negative() const
 {
