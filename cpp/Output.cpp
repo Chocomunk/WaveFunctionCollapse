@@ -1,8 +1,11 @@
 #include "Output.h"
 
-void render_image(Model& model, std::vector<cv::Mat>& patterns, cv::Mat &out_img, 
-	int width, int height, int dim) {
+void render_image(Model& model, std::vector<cv::Mat>& patterns, cv::Mat &out_img) {
+	const int height = model.wave_shape.y;
+	const int width = model.wave_shape.x;
+	const int dim = model.dim;
 	std::vector<int> valid_patts = std::vector<int>(model.num_patterns);
+	
 	for (int row=0; row < height; row++) {
 		for (int col=0; col < width; col++) {
 			// Get the valid patterns for this position and render the

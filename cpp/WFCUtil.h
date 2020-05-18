@@ -6,10 +6,10 @@
  * \brief Represents a pair of integral values.
  */
 struct pair {
-	size_t x; size_t y; size_t size;
+	int x; int y; int size;
 
 public:
-	pair(size_t x=0, size_t y=0);
+	pair(int x=0, int y=0);
 	
 	/**
 	 * \return True if neither x nor y are negative, False otherwise
@@ -23,7 +23,7 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& os, const pair& obj);
 	inline pair operator+(const pair& other) const;
-	inline pair operator+(const size_t val) const;
+	inline pair operator+(const int val) const;
 	inline pair operator%(const pair& other) const;
 	inline bool operator<(const pair& other) const;
 };
@@ -106,7 +106,7 @@ inline pair pair::operator+(const pair& other) const
 	return pair(this->x + other.x, this->y + other.y);
 }
 
-inline pair pair::operator+(const size_t val) const
+inline pair pair::operator+(const int val) const
 {
 	return pair(this->x + val, this->y + val);
 }

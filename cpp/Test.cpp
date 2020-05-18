@@ -100,7 +100,7 @@ int main() {
 	// Initialize blank output image
 	cv::Mat result = cv::Mat(WIDTH, WIDTH, template_imgs[0].type());
 
-	render_image(model, patterns, result, WIDTH, HEIGHT, TILE_DIM);
+	render_image(model, patterns, result);
 	
 	cv::resize(result, result, cv::Size(800, 800), 0.0, 0.0, cv::INTER_AREA);
 	cv::imshow("result", result);

@@ -107,7 +107,7 @@ void Model::observe_wave(pair &pos, std::vector<int> &counts) {
 
 	// Randomly selects a state for collapse. Weighted by state frequency count.
 	for (collapsed_index = 0; collapsed_index < num_patterns && rnd>0; collapsed_index++) {
-		if (waves_[idx_row_col_patt_base + collapsed_index]) {
+		if (waves_[collapsed_index + idx_row_col_patt_base]) {
 			rnd -= counts[collapsed_index];
 		}
 	}
@@ -115,7 +115,7 @@ void Model::observe_wave(pair &pos, std::vector<int> &counts) {
 
 	// Bans all other states, since we have collapsed to a single state.
 	for (int patt_idx = 0; patt_idx < num_patterns; patt_idx++) {
-		if (waves_[idx_row_col_patt_base + patt_idx] != (patt_idx == collapsed_index)) 
+		if (waves_[patt_idx + idx_row_col_patt_base] != (patt_idx == collapsed_index)) 
 			ban_waveform(waveform(pos, patt_idx));
 	}
 

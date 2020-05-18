@@ -1,6 +1,6 @@
 #include "WFCUtil.h"
 
-pair::pair(size_t x, size_t y) : x(x), y(y), size(x * y) {}
+pair::pair(int x, int y) : x(x), y(y), size(x * y) {}
 
 std::ostream& operator<<(std::ostream& os, const pair& obj) {
 	os << "(" << obj.x << ", " << obj.y << ")";
