@@ -1,7 +1,5 @@
-#include "Input.h"
-#include "Model.h"
-#include "WFCUtil.h"
-#include "Output.h"
+#include "input.h"
+#include "wfc.h"
 #include <opencv2/opencv.hpp>
 
 #define TILES_DIR "../../../tiles/spirals"
@@ -12,10 +10,12 @@
 #define HEIGHT 64
 //#define SHOWPATTS
 
+using namespace wfc;
+
 int main() {
 	// The set of overlays describing how to compare two patterns. Stored
 	// as an (x,y) shift. Shape: [O]
-	std::vector<pair> overlays;
+	std::vector<Pair> overlays;
 	generate_neighbor_overlay(overlays);
 	
 	// The set of input images to use as templates. Shape: [T]
@@ -33,7 +33,7 @@ int main() {
 	std::vector<std::vector<int>> fit_table;
 	generate_fit_table(patterns, overlays, TILE_DIM, fit_table);
 	
-	Model model(pair(WIDTH, HEIGHT), 
+	Model model(Pair(WIDTH, HEIGHT), 
 		patterns.size(), overlays.size(), 
 		TILE_DIM, PERIODIC);
 
@@ -51,8 +51,8 @@ int main() {
 			size_t index = pat_idx1 * model.overlay_count + overlay_idx;
 			size_t opposite_idx = pat_idx1 * model.overlay_count + ((overlay_idx + 2) % model.overlay_count);
 			auto valid_patterns = model.fit_table[index];
-			pair overlay = overlays[overlay_idx];
-			pair opposite = overlays[(overlay_idx + 2) % model.overlay_count];
+			Pair overlay = overlays[overlay_idx];
+			Pair opposite = overlays[(overlay_idx + 2) % model.overlay_count];
 			std::cout << "Valid Patterns: ";
 			for (int pattern_2: valid_patterns)	std::cout << pattern_2 << ", ";
 			std::cout << std::endl;

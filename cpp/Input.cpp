@@ -1,4 +1,4 @@
-#include "Input.h"
+#include "input.h"
 
 void load_tiles(std::string dirname, std::vector<cv::Mat> &out){
 	std::vector<cv::String> filenames;
