@@ -115,8 +115,10 @@ void Model::observe_wave(pair &pos, std::vector<int> &counts) {
 
 	// Bans all other states, since we have collapsed to a single state.
 	for (int patt_idx = 0; patt_idx < num_patterns; patt_idx++) {
-		if (waves_[patt_idx + idx_row_col_patt_base] != (patt_idx == collapsed_index)) 
-			ban_waveform(waveform(pos, patt_idx));
+		if (waves_[patt_idx + idx_row_col_patt_base] != (patt_idx == collapsed_index)){
+			waveform w = waveform(pos, patt_idx);
+			ban_waveform(w);
+		}
 	}
 
 	// Assigns the final state of this position.
@@ -155,8 +157,10 @@ void Model::propagate(std::vector<pair>& overlays, std::vector<std::vector<int>>
 						compatible_neighbors_[compat_idx]--;
 
 						// If there are no valid neighbors left, this state is impossible.
-						if (compatible_neighbors_[compat_idx] == 0) 
-							ban_waveform(waveform(wave_o, pattern_2));
+						if (compatible_neighbors_[compat_idx] == 0){
+							waveform w = waveform(wave_o, pattern_2);
+							ban_waveform(w);
+						}
 					}
 				}
 			}

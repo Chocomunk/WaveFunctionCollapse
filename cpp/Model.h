@@ -21,6 +21,17 @@ public:
 	pair wave_shape;
 	pair num_patt_2d;
 
+	/* Public for the sake of testing */
+	/**
+	 * \brief Stores a count of the number of compatible neighbors for this pattern.
+	 * If there are no compatible neighbors, then it is impossible for this pattern
+	 * to occur and we should ban it.
+	 * 
+	 * Shape: [WX, WY, N, O]
+	 */
+	std::vector<int> compatible_neighbors_;
+
+	
 private:
 	int stack_index_ = 0;
 	bool periodic_;
@@ -33,11 +44,12 @@ private:
 	std::vector<waveform> propagate_stack_;
 
 	/**
-	 * \brief Stores the entropy (number of valid patterns) for a given position.
+	 * \brief Stores the index of the final collapsed pattern for a given position.
 	 *
 	 * Shape: [WX, WY]
 	 */
-	std::vector<int> entropy_;
+	std::vector<int> observed_;
+
 
 	/**
 	 * \brief Stores whether a specific waveform (position, state) is allowed
@@ -48,20 +60,13 @@ private:
 	std::vector<char> waves_;
 
 	/**
-	 * \brief Stores the index of the final collapsed pattern for a given position.
+	 * \brief Stores the entropy (number of valid patterns) for a given position.
 	 *
 	 * Shape: [WX, WY]
 	 */
-	std::vector<int> observed_;
+	std::vector<int> entropy_;
 
-	/**
-	 * \brief Stores a count of the number of compatible neighbors for this pattern.
-	 * If there are no compatible neighbors, then it is impossible for this pattern
-	 * to occur and we should ban it.
-	 *
-	 * Shape: [WX, WY, N, O]
-	 */
-	std::vector<int> compatible_neighbors_;
+
 
 public:
 	/**

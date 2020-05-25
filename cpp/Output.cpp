@@ -21,8 +21,10 @@ void render_image(Model& model, std::vector<cv::Mat>& patterns, cv::Mat &out_img
 						bgr = BGR(204, 51, 255);
 					} else {
 						bgr = BGR(0, 0, 0);
-						for (int patt_idx: valid_patts)
-							bgr += patterns[patt_idx].ptr<BGR>(r - row)[c - col] / valid_patts.size();
+						for (int patt_idx: valid_patts){
+							BGR computed = patterns[patt_idx].ptr<BGR>(r - row)[c - col] / valid_patts.size();
+							bgr += computed;
+						}
 					}
 				}
 			}
