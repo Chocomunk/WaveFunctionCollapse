@@ -23,7 +23,7 @@ namespace wfc
 		return os;
 	}
 
-	void BGR::operator+=(BGR& other) {
+	void BGR::operator+=(BGR other) {
 		this->b += other.b;
 		this->g += other.g;
 		this->r += other.r;

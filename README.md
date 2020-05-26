@@ -5,12 +5,30 @@ This is a C++ and (separate) python port of https://github.com/mxgmn/WaveFunctio
 All contained template images also come from https://github.com/mxgmn/WaveFunctionCollapse.
 
 ## Getting Started
-**TODO**
+To build the cpp project with g++ on linux, run:
 
-Current build system is Microsoft Visual Studio. A makefile is currently being written.
+`make build`
+
+This will generate a `bin/wfc` executable. This repository comes with template images (credited above), which can be used to test the compiled executable as follows:
+
+#### Generate Red Maze:
+
+`bin/wfc tiles/red/ 2`
+
+#### Generate Spiral Design:
+
+`bin/wfc tiles/spirals/ 3`
+
+#### Generate Flowers:
+
+`bin/wfc tiles/spirals/ 3 0`
 
 ## Requirements
-This project was most recently built with [OpenCV 4.3.0](https://docs.opencv.org/4.3.0/), which is the only dependency.
+This project was most recently built with [OpenCV 4.3.0](https://docs.opencv.org/4.3.0/), which is the only dependency. On our systems, we installed OpenCV using the following command:
+
+`sudo apt-get install libopencv-dev`
+
+In the case that the compiler cannot find OpenCV, you may need to change the `$(OPENCV)` variable in the makefile to any of `opencv['',1,2,3,4]`.
 
 ## The WFC Algorithm
 

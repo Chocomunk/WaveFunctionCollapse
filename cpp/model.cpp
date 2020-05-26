@@ -62,10 +62,10 @@ namespace wfc
 	}
 
 	void Model::clear(std::vector<std::vector<int>> &fit_table) {
-		for (size_t wave = 0; wave < wave_shape.size; wave++) {
-			for (size_t patt = 0; patt < num_patterns; patt++) {
+		for (int wave = 0; wave < wave_shape.size; wave++) {
+			for (int patt = 0; patt < num_patterns; patt++) {
 				waves_[wave * num_patterns + patt] = true;
-				for (size_t overlay=0; overlay < overlay_count; overlay++) {
+				for (int overlay=0; overlay < overlay_count; overlay++) {
 					// Reset count of compatible neighbors in the fit table (to all states)
 					compatible_neighbors_[(wave*num_patterns + patt)*overlay_count + overlay] = fit_table[patt*overlay_count + (overlay + 2)%overlay_count].size();
 				}
@@ -97,7 +97,7 @@ namespace wfc
 		// Determines superposition of states and their total frequency counts.
 		int possible_patterns_sum = 0;
 		std::vector<int> possible_indices;
-		for (size_t i = 0; i < num_patterns; i++) {
+		for (int i = 0; i < num_patterns; i++) {
 			if (waves_[idx_row_col_patt_base + i]) {
 				possible_patterns_sum += counts[i];
 				possible_indices.push_back(i);
@@ -133,7 +133,7 @@ namespace wfc
 			const int pattern_i = wave_f.state;
 
 			// Check all overlayed tiles.
-			for(size_t overlay=0; overlay < overlay_count; overlay++) {
+			for(int overlay=0; overlay < overlay_count; overlay++) {
 				Pair wave_o;
 
 				// If periodic, wrap positions past the edge of the board.
@@ -180,14 +180,14 @@ namespace wfc
 		return propagate_stack_[stack_index_];
 	}
 
-	void Model::ban_waveform(Waveform& wave) {
+	void Model::ban_waveform(Waveform wave) {
 		const int waves_idx = get_idx(wave.pos, wave_shape, num_patterns, wave.state);
 		const int wave_i = get_idx(wave.pos, wave_shape, 1, 0);
 
 		// Mark this specific Waveform as disallowed, and update neighboring patterns
 		// to block propagation through this state.
 		waves_[waves_idx] = false;
-		for (size_t overlay=0; overlay < overlay_count; overlay++) {
+		for (int overlay=0; overlay < overlay_count; overlay++) {
 			compatible_neighbors_[waves_idx*overlay_count + overlay] = 0;
 		}
 		stack_waveform(wave);	// Propagate changes through neighboring positions.

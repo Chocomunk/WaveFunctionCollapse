@@ -21,7 +21,7 @@ namespace wfc
 		/**
 		 * \return True if '(this + shift) < other', False otherwise
 		 */
-		inline bool shifted_less_than(const Pair& other, const size_t shift) const;
+		inline bool shifted_less_than(const Pair& other, const int shift) const;
 
 		friend std::ostream& operator<<(std::ostream& os, const Pair& obj);
 		inline Pair operator+(const Pair& other) const;
@@ -54,7 +54,7 @@ namespace wfc
 		BGR(uchar b, uchar g, uchar r);
 		BGR operator/(int val) const;
 		friend std::ostream& operator<<(std::ostream& os, const BGR& obj);
-		void operator+=(BGR& other);
+		void operator+=(BGR other);
 	};
 
 	/**
@@ -95,7 +95,7 @@ namespace wfc
 		return this->x >= 0 && this->y >= 0;
 	}
 
-	inline bool Pair::shifted_less_than(const Pair& other, const size_t shift) const
+	inline bool Pair::shifted_less_than(const Pair& other, const int shift) const
 	{
 		return this->x + shift < other.x && this->y + shift < other.y;
 	}

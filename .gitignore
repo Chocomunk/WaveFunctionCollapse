@@ -114,6 +114,11 @@ venv.bak/
 
 # Visual Studio solution folder
 VisualStudioSolution/
+.vscode/
+
+# Build folders
+bin/
+obj/
 
 # Compiled Object files
 *.slo

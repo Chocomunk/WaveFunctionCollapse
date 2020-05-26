@@ -13,26 +13,26 @@ int main(int argc, char** argv) {
 	int height = 64;
 	int render = 0;
 
-	assert(argc > 1);
+	if (!(argc > 1)) {
+		std::cout << "Usage {arg_name (options) | default}:" << std::endl <<
+			"\twfc {image folder} {tile dim | 3} {rotate? (0/1) | 1} {periodic? (0/1) | 1} {width | 64} {height | 64} {render? (0/1) | 0}"
+			<< std::endl;
+		return -1;
+	}
+
 	tiles_dir = argv[1];
-	if (argc > 2) {
+	if (argc > 2)
 		tile_dim = atoi(argv[2]); // denotes tile dimension
-	}
-	if (argc > 3) {
+	if (argc > 3)
 		rotate = atoi(argv[3]); // 0 for no rotation, 1 for rotation
-	}
-	if (argc > 4) {
+	if (argc > 4)
 		periodic = atoi(argv[4]); // 0 if not periodic, 1 for periodic 
-	}
-	if (argc > 5) {
+	if (argc > 5)
 		width = atoi(argv[5]); // denotes tile width
-	}
-	if (argc > 6) {
+	if (argc > 6)
 		height = atoi(argv[6]); // denotes tile height;
-	}
-	if (argc > 7) {
+	if (argc > 7)
 		render = atoi(argv[7]); // render toggle
-	}
 
 	// The set of overlays describing how to compare two patterns. Stored
 	// as an (x,y) shift. Shape: [O]
@@ -59,19 +59,24 @@ int main(int argc, char** argv) {
 	            patterns.size(), overlays.size(),
 	            tile_dim, periodic);
 
+	// Shows all patterns
 	if (render) {
+		std::cout << "Pattern Viewer Controls:" << std::endl <<
+			"\tEsc: Quit and continue" << std::endl <<
+			"\tM: Next left pattern" << std::endl <<
+			"\t(Any Other Key): Next right pattern" << std::endl;
+
 		bool break_all = false;
 		std::cout << std::endl;
 
-		for (size_t pat_idx1 = 0; pat_idx1 < model.num_patterns; pat_idx1++) {
+		for (int pat_idx1 = 0; pat_idx1 < model.num_patterns; pat_idx1++) {
 			cv::Mat scaled1;
 			auto patt1 = patterns[pat_idx1];
 			cv::resize(patt1, scaled1, cv::Size(128, 128), 0.0, 0.0, cv::INTER_AREA);
 			std::cout << "Pattern: " << pat_idx1 << " | Pattern count: " << patterns[pat_idx1] << std::endl;
 
-			for (size_t overlay_idx = 0; overlay_idx < model.overlay_count; overlay_idx++) {
+			for (int overlay_idx = 0; overlay_idx < model.overlay_count; overlay_idx++) {
 				size_t index = pat_idx1 * model.overlay_count + overlay_idx;
-				size_t opposite_idx = pat_idx1 * model.overlay_count + ((overlay_idx + 2) % model.overlay_count);
 				auto valid_patterns = fit_table[index];
 				Pair overlay = overlays[overlay_idx];
 				Pair opposite = overlays[(overlay_idx + 2) % model.overlay_count];
@@ -82,7 +87,7 @@ int main(int argc, char** argv) {
 
 				bool break_part = false;
 
-				for (size_t pat_idx2 = 0; pat_idx2 < model.num_patterns; pat_idx2++) {
+				for (int pat_idx2 = 0; pat_idx2 < model.num_patterns; pat_idx2++) {
 					auto patt2 = patterns[pat_idx2];
 					cv::Mat scaled2;
 					cv::resize(patt2, scaled2, cv::Size(128, 128), 0.0, 0.0, cv::INTER_AREA);
@@ -107,7 +112,7 @@ int main(int argc, char** argv) {
 						break_part = true;
 						break;
 					}
-					else if (k == int('n')) break;
+					// else if (k == int('n')) break;
 				}
 				std::cout << std::endl;
 				if (break_all || break_part) break;

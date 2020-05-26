@@ -17,8 +17,8 @@ namespace wfc
 	public:
 		const char dim;
 		const int iteration_limit;
-		size_t num_patterns;
-		size_t overlay_count;
+		const int num_patterns;
+		const int overlay_count;
 		Pair wave_shape;
 		Pair num_patt_2d;
 
@@ -121,6 +121,6 @@ namespace wfc
 		 * \brief Bans a specific state at the Waveform position. Partially collapses
 		 * the overall state at that position and reduces it's entropy.
 		 */
-		void ban_waveform(Waveform& wave);
+		void ban_waveform(Waveform wave);
 	};
 }

@@ -15,7 +15,6 @@ void create_waveforms(const std::vector<cv::Mat> &templates, const int dim,
 	for (const auto& tile : templates) {
 		const int height = tile.rows;
 		const int width = tile.cols;
-		int channels = tile.channels();
 
 		// Add all (D x D) subarrays and (if requested) all it's rotations.
 		for (int col = 0; col < width + 1 - dim; col++) {
