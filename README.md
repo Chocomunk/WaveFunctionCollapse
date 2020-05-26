@@ -9,19 +9,11 @@ To build the cpp project with g++ on linux, run:
 
 `make build`
 
-This will generate a `bin/wfc` executable. This repository comes with template images (credited above), which can be used to test the compiled executable as follows:
+This will generate a `bin/wfc` executable. This repository comes with template images (credited above), which can be used to test the compiled executable. We have included 5 test cases, which can all be executed by running:
 
-#### Generate Red Maze:
+`make test`
 
-`bin/wfc tiles/red/ 2`
-
-#### Generate Spiral Design:
-
-`bin/wfc tiles/spirals/ 3`
-
-#### Generate Flowers:
-
-`bin/wfc tiles/spirals/ 3 0`
+The output images are stored in the `results/` folder.
 
 ## Requirements
 This project was most recently built with [OpenCV 4.3.0](https://docs.opencv.org/4.3.0/), which is the only dependency. On our systems, we installed OpenCV using the following command:

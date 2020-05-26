@@ -12,8 +12,9 @@ int main(int argc, char** argv) {
 	int width = 64;
 	int height = 64;
 	int render = 0;
+	char* out_name;
 
-	if (!(argc > 1)) {
+	if (!(argc > 2)) {
 		std::cout << "Usage {arg_name (options) | default}:" << std::endl <<
 			"\twfc {image folder} {tile dim | 3} {rotate? (0/1) | 1} {periodic? (0/1) | 1} {width | 64} {height | 64} {render? (0/1) | 0}"
 			<< std::endl;
@@ -31,8 +32,13 @@ int main(int argc, char** argv) {
 		width = atoi(argv[5]); // denotes tile width
 	if (argc > 6)
 		height = atoi(argv[6]); // denotes tile height;
-	if (argc > 7)
-		render = atoi(argv[7]); // render toggle
+	if (argc > 7) {
+		out_name = argv[7];
+	} else {
+		out_name = "result.png";
+	}
+	if (argc > 8)
+		render = atoi(argv[8]); // render toggle
 
 	// The set of overlays describing how to compare two patterns. Stored
 	// as an (x,y) shift. Shape: [O]
@@ -133,8 +139,9 @@ int main(int argc, char** argv) {
 	cv::waitKey(0);
 
 	std::ostringstream outputDir;
-	outputDir << tiles_dir << "/results/cpp/result.png";
+	outputDir << "results/" << out_name;
 	cv::imwrite(outputDir.str(), result);
+	std::cout << outputDir.str() << std::endl;
 
 	return 0;
 }

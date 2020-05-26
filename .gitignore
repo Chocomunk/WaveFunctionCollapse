@@ -119,6 +119,7 @@ VisualStudioSolution/
 # Build folders
 bin/
 obj/
+results/
 
 # Compiled Object files
 *.slo

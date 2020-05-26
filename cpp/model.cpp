@@ -126,7 +126,7 @@ namespace wfc
 	}
 
 	void Model::propagate(std::vector<Pair>& overlays, std::vector<std::vector<int>> &fit_table) {
-		int iterations = 0;
+		// int iterations = 0;
 		while (stack_index_ > 0) {
 			const Waveform wave_f = pop_waveform();
 			Pair wave = wave_f.pos;
@@ -164,9 +164,9 @@ namespace wfc
 				}
 			}
 
-			iterations += 1;
-			if (iterations % 1000 == 0)
-				std::cout << "propagation iteration: " << iterations << ", propagation stack size: " << stack_index_ << std::endl;
+			// iterations += 1;
+			// if (iterations % 1000 == 0)
+			// 	std::cout << "propagation iteration: " << iterations << ", propagation stack size: " << stack_index_ << std::endl;
 		}
 	}
 
